@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface CovidRepository {
 
-    suspend fun getSummary() : Flow<Summary?>
+    fun getSummary() : Flow<Resource<Summary>>
 }

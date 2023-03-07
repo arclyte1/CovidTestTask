@@ -6,15 +6,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.covidtesttask.common.Resource
+import com.example.covidtesttask.domain.model.Country
 import com.example.covidtesttask.domain.model.Summary
 import com.example.covidtesttask.domain.usecase.GetSummaryUseCase
+import com.example.covidtesttask.presentation.country_list.model.CountryItem
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@HiltViewModel
 class CountryListViewModel @Inject constructor(
     private val getSummaryUseCase: GetSummaryUseCase
 ) : ViewModel() {
+
+    private var countryList: List<Country> = emptyList()
 
     private val _uiState: MutableState<CountryListState> = mutableStateOf(CountryListState())
     val uiState: State<CountryListState> = _uiState
@@ -27,34 +36,46 @@ class CountryListViewModel @Inject constructor(
         getSummary()
     }
 
-    fun search() {
-
+    fun search(searchQuery: String) {
+        _uiState.value = _uiState.value.copy(
+            searchQuery = searchQuery,
+            countries = performSearch(searchQuery).map { CountryItem.fromCountry(it) }
+        )
     }
 
     private fun getSummary() {
         getSummaryUseCase().onEach { resource ->
-            when (resource) {
-                is Resource.Loading -> {
-                    _uiState.value = _uiState.value.copy(
-                        lastUpdated = null,
-                        countries = emptyList(),
-                    )
-                }
-                is Resource.Success -> {
-                    updateData(resource.data!!)
-                }
-                is Resource.Error -> {
-                    // TODO: display error
+            withContext(viewModelScope.coroutineContext) {
+                when (resource) {
+                    is Resource.Loading -> {
+                        _uiState.value = _uiState.value.copy(
+                            lastUpdated = null,
+                            countries = emptyList(),
+                        )
+                    }
+                    is Resource.Success -> {
+                        updateData(resource.data!!)
+                    }
+                    is Resource.Error -> {
+                        // TODO: display error
+                    }
                 }
             }
-        }.launchIn(viewModelScope)
+        }.launchIn(CoroutineScope(Dispatchers.IO))
     }
 
     private fun updateData(summary: Summary) {
-        _uiState.value = CountryListState.fromSummary(summary)
+        countryList = summary.countries
+        _uiState.value = _uiState.value.copy(
+            lastUpdated = summary.lastUpdated,
+            countries = performSearch(_uiState.value.searchQuery).map { CountryItem.fromCountry(it) }
+        )
     }
 
-    private fun performSearch(searchQuery: String) {
-
+    private fun performSearch(searchQuery: String): List<Country> {
+        return countryList.filter {
+            it.name.lowercase().contains(searchQuery.lowercase())
+                    || it.code.lowercase().contains(searchQuery.lowercase())
+        }
     }
 }

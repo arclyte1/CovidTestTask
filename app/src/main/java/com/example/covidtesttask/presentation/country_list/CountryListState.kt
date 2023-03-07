@@ -6,15 +6,6 @@ import java.util.*
 
 data class CountryListState(
     val lastUpdated: Date? = null,
-    val countries: List<CountryItem> = emptyList()
-) {
-
-    companion object {
-        fun fromSummary(summary: Summary): CountryListState {
-            return CountryListState(
-                lastUpdated = summary.lastUpdated,
-                countries = summary.countries.map { CountryItem.fromCountry(it) }
-            )
-        }
-    }
-}
+    val countries: List<CountryItem> = emptyList(),
+    val searchQuery: String = "",
+)
