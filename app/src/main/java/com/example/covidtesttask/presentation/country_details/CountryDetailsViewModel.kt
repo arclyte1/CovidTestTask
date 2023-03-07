@@ -1,6 +1,5 @@
 package com.example.covidtesttask.presentation.country_details
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -39,16 +38,20 @@ class CountryDetailsViewModel @Inject constructor(
             withContext(viewModelScope.coroutineContext) {
                 when(resource) {
                     is Resource.Loading -> {
-
+                        _uiState.value = _uiState.value.copy(
+                            refreshing = true
+                        )
                     }
                     is Resource.Success -> {
                         _uiState.value = _uiState.value.copy(
+                            refreshing = false,
                             country = Country.fromCountryDetails(resource.data!!)
                         )
-                        Log.d("ViewModel", resource.data.historyCases.toString())
                     }
                     is Resource.Error -> {
-                        // TODO: display error
+                        _uiState.value = _uiState.value.copy(
+                            refreshing = false
+                        )
                     }
                 }
             }
