@@ -4,5 +4,5 @@ import java.util.*
 
 data class Summary(
     val lastUpdated: Date?,
-    val countries: List<Country>
+    val countries: List<CountrySummary>
 )

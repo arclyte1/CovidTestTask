@@ -3,7 +3,8 @@ package com.example.covidtesttask.data.local.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.covidtesttask.domain.model.Country
+import com.example.covidtesttask.domain.model.CountrySummary
+import com.example.covidtesttask.domain.model.CovidCases
 import java.util.Date
 
 
@@ -16,7 +17,7 @@ data class CountryEntity(
 ) {
 
     companion object {
-        fun fromCountry(country: Country, dateUpdated: Date): CountryEntity {
+        fun fromCountry(country: CountrySummary, dateUpdated: Date): CountryEntity {
             return CountryEntity(
                 slug = country.slug,
                 name = country.name,

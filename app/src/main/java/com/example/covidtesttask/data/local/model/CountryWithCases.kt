@@ -2,7 +2,8 @@ package com.example.covidtesttask.data.local.model
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.example.covidtesttask.domain.model.Country
+import com.example.covidtesttask.domain.model.CountryDetails
+import com.example.covidtesttask.domain.model.CountrySummary
 import com.example.covidtesttask.domain.model.CovidCases
 
 data class CountryWithCases(
@@ -19,23 +20,36 @@ data class CountryWithCases(
     val casesHistory: List<CasesEntity>
 ) {
 
-    fun toCountry(): Country {
-        return Country(
+    fun toCountrySummary(): CountrySummary {
+        return CountrySummary(
             name = country.name,
             code = country.code,
             slug = country.slug,
-            confirmed = CovidCases(
-                total = lastCases.totalConfirmed,
-                new = lastCases.newConfirmed
-            ),
-            recovered = CovidCases(
-                total = lastCases.totalRecovered,
-                new = lastCases.newRecovered
-            ),
-            deaths = CovidCases(
-                total = lastCases.totalDeaths,
-                new = lastCases.newDeaths
+            cases = CovidCases(
+                totalConfirmed = lastCases.totalConfirmed,
+                newConfirmed = lastCases.newConfirmed,
+                totalRecovered = lastCases.totalRecovered,
+                newRecovered = lastCases.newRecovered,
+                totalDeaths = lastCases.totalDeaths,
+                newDeaths = lastCases.newDeaths
             )
+        )
+    }
+
+    fun toCountryDetails(): CountryDetails {
+        return CountryDetails(
+            name = country.name,
+            code = country.code,
+            slug = country.slug,
+            latestCases = CovidCases(
+                totalConfirmed = lastCases.totalConfirmed,
+                newConfirmed = lastCases.newConfirmed,
+                totalRecovered = lastCases.totalRecovered,
+                newRecovered = lastCases.newRecovered,
+                totalDeaths = lastCases.totalDeaths,
+                newDeaths = lastCases.newDeaths
+            ),
+            historyCases = casesHistory.map { it.toCovidCases(country.dateUpdated) }
         )
     }
 }

@@ -12,7 +12,7 @@ data class SummaryDto(
     fun toSummary(): Summary {
         return Summary(
             lastUpdated = date,
-            countries = countries.map { it.toCountry() }
+            countries = countries.map { it.toCountrySummary() }
         )
     }
 }

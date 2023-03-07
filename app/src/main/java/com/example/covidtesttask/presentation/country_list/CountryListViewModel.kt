@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.covidtesttask.common.Resource
-import com.example.covidtesttask.domain.model.Country
+import com.example.covidtesttask.domain.model.CountrySummary
 import com.example.covidtesttask.domain.model.Summary
 import com.example.covidtesttask.domain.usecase.GetSummaryUseCase
 import com.example.covidtesttask.presentation.country_list.model.CountryItem
@@ -23,7 +23,7 @@ class CountryListViewModel @Inject constructor(
     private val getSummaryUseCase: GetSummaryUseCase
 ) : ViewModel() {
 
-    private var countryList: List<Country> = emptyList()
+    private var countryList: List<CountrySummary> = emptyList()
 
     private val _uiState: MutableState<CountryListState> = mutableStateOf(CountryListState())
     val uiState: State<CountryListState> = _uiState
@@ -72,7 +72,7 @@ class CountryListViewModel @Inject constructor(
         )
     }
 
-    private fun performSearch(searchQuery: String): List<Country> {
+    private fun performSearch(searchQuery: String): List<CountrySummary> {
         return countryList.filter {
             it.name.lowercase().contains(searchQuery.lowercase())
                     || it.code.lowercase().contains(searchQuery.lowercase())

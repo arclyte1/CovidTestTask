@@ -1,10 +1,9 @@
 package com.example.covidtesttask.domain.model
 
-data class Country(
+data class CountryDetails(
     val name: String,
     val code: String,
     val slug: String,
-    val confirmed: CovidCases,
-    val deaths: CovidCases,
-    val recovered: CovidCases,
+    val latestCases: CovidCases,
+    val historyCases: List<CovidCases>
 )

@@ -1,6 +1,6 @@
 package com.example.covidtesttask.presentation.country_list.model
 
-import com.example.covidtesttask.domain.model.Country
+import com.example.covidtesttask.domain.model.CountrySummary
 
 data class CountryItem(
     val code: String,
@@ -14,16 +14,16 @@ data class CountryItem(
 ) {
 
     companion object {
-        fun fromCountry(country: Country): CountryItem {
+        fun fromCountry(country: CountrySummary): CountryItem {
             return CountryItem(
                 code = country.code,
                 displayName = country.name,
-                newConfirmed = country.confirmed.new,
-                totalConfirmed = country.confirmed.total,
-                newRecovered = country.recovered.new,
-                totalRecovered = country.recovered.total,
-                newDeaths = country.deaths.new,
-                totalDeaths = country.deaths.total,
+                newConfirmed = country.cases.newConfirmed,
+                totalConfirmed = country.cases.totalConfirmed,
+                newRecovered = country.cases.newRecovered,
+                totalRecovered = country.cases.totalRecovered,
+                newDeaths = country.cases.newDeaths,
+                totalDeaths = country.cases.totalDeaths,
             )
         }
     }

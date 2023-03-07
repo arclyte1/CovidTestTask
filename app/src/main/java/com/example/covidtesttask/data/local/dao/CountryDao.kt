@@ -13,4 +13,8 @@ interface CountryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(countries: List<CountryEntity>)
+
+    @Transaction
+    @Query("select * from country where code=:countryCode limit 1")
+    fun getCountryWithCasesByCode(countryCode: String): CountryWithCases
 }

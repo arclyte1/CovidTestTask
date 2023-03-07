@@ -3,7 +3,9 @@ package com.example.covidtesttask.data.local.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import com.example.covidtesttask.domain.model.Country
+import com.example.covidtesttask.domain.model.CountrySummary
+import com.example.covidtesttask.domain.model.CovidCases
+import java.util.*
 
 @Entity(
     tableName = "cases",
@@ -28,17 +30,36 @@ data class CasesEntity(
     @ColumnInfo(name = "new_deaths") val newDeaths: Int,
 ) {
 
+    fun toCovidCases(lastUpdated: Long? = null): CovidCases {
+        val date = if (lastUpdated == null) {
+            null
+        } else {
+            val calendar = Calendar.getInstance()
+            calendar.timeInMillis = lastUpdated - daysBefore.toLong() * 24 * 60 * 60 * 1000
+            calendar.time
+        }
+        return CovidCases(
+            date = date,
+            totalConfirmed = totalConfirmed,
+            newConfirmed = newConfirmed,
+            totalRecovered = totalRecovered,
+            newRecovered = newRecovered,
+            totalDeaths = totalDeaths,
+            newDeaths = newDeaths
+        )
+    }
+
     companion object {
-        fun fromCountry(country: Country, daysBefore: Int): CasesEntity {
+        fun fromCountry(country: CountrySummary, daysBefore: Int): CasesEntity {
             return CasesEntity(
                 countrySlug = country.slug,
                 daysBefore = daysBefore,
-                totalConfirmed = country.confirmed.total,
-                newConfirmed = country.confirmed.new,
-                totalRecovered = country.recovered.total,
-                newRecovered = country.recovered.new,
-                totalDeaths = country.deaths.total,
-                newDeaths = country.deaths.new,
+                totalConfirmed = country.cases.totalConfirmed,
+                newConfirmed = country.cases.newConfirmed,
+                totalRecovered = country.cases.totalRecovered,
+                newRecovered = country.cases.newRecovered,
+                totalDeaths = country.cases.totalDeaths,
+                newDeaths = country.cases.newDeaths,
             )
         }
     }

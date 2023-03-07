@@ -1,6 +1,6 @@
 package com.example.covidtesttask.data.remote.dto
 
-import com.example.covidtesttask.domain.model.Country
+import com.example.covidtesttask.domain.model.CountrySummary
 import com.example.covidtesttask.domain.model.CovidCases
 import com.google.gson.annotations.SerializedName
 
@@ -16,23 +16,19 @@ data class SummaryCountryDto(
     @SerializedName("TotalRecovered") val totalRecovered: Int,
 ) {
 
-    fun toCountry(): Country {
-        return Country(
+    fun toCountrySummary(): CountrySummary {
+        return CountrySummary(
             name = name,
             code = code,
             slug = slug,
-            confirmed = CovidCases(
-                total = totalConfirmed,
-                new = newConfirmed,
-            ),
-            deaths = CovidCases(
-                total = totalDeaths,
-                new = newDeaths,
-            ),
-            recovered = CovidCases(
-                total = totalRecovered,
-                new = newRecovered,
-            ),
+            cases = CovidCases(
+                totalConfirmed = totalConfirmed,
+                newConfirmed = newConfirmed,
+                totalRecovered = totalRecovered,
+                newRecovered = newRecovered,
+                totalDeaths = totalDeaths,
+                newDeaths = newDeaths
+            )
         )
     }
 }
