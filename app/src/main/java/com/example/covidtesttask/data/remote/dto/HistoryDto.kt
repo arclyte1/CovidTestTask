@@ -61,7 +61,7 @@ data class HistoryDto(
                 cases.add(
                     CasesEntity(
                         countrySlug = slug,
-                        daysBefore = i + 1,
+                        daysBefore = Constants.HISTORY_DAYS_COUNT - (i + 1),
                         totalConfirmed = data!!.confirmed,
                         newConfirmed = -1,
                         totalRecovered = data.recovered,
@@ -79,6 +79,7 @@ data class HistoryDto(
                 )
             }
             cases.removeLast()
+            cases.sortBy { it.daysBefore }
             return cases.toList()
         }
     }

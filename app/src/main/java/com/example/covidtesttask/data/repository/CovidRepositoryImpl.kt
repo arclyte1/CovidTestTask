@@ -1,6 +1,5 @@
 package com.example.covidtesttask.data.repository
 
-import androidx.compose.ui.unit.Constraints
 import com.example.covidtesttask.common.Constants
 import com.example.covidtesttask.common.Resource
 import com.example.covidtesttask.data.local.CovidDb
@@ -26,6 +25,7 @@ class CovidRepositoryImpl @Inject constructor(
             emit(Resource.Loading())
             val localSummary = getLocalSummary()
             emit(Resource.Success(localSummary))
+            emit(Resource.Loading())
             val remoteSummary = getRemoteSummary()
             saveLocalSummary(remoteSummary)
             emit(Resource.Success(getLocalSummary()))
@@ -36,67 +36,6 @@ class CovidRepositoryImpl @Inject constructor(
     }
 
     private suspend fun getRemoteSummary(): Summary {
-//
-//        // TESTING
-//        delay(500)
-//        return Summary(
-//            lastUpdated = Calendar.getInstance().time,
-//            countries = listOf(
-//                Country(
-//                    name = "Bangladesh",
-//                    code = "BD",
-//                    slug = "bangladesh",
-//                    confirmed = CovidCases(
-//                        total = 700_000_000,
-//                        new = 19_000
-//                    ),
-//                    recovered = CovidCases(
-//                        total = 30,
-//                        new = 4
-//                    ),
-//                    deaths = CovidCases(
-//                        total = 8,
-//                        new = 2
-//                    )
-//                ),
-//                Country(
-//                    name = "Bangladesh",
-//                    code = "BD",
-//                    slug = "bangladesh",
-//                    confirmed = CovidCases(
-//                        total = 70,
-//                        new = 9
-//                    ),
-//                    recovered = CovidCases(
-//                        total = 30,
-//                        new = 4
-//                    ),
-//                    deaths = CovidCases(
-//                        total = 8,
-//                        new = 2
-//                    )
-//                ),
-//                Country(
-//                    name = "Bangladesh",
-//                    code = "BD",
-//                    slug = "bangladesh",
-//                    confirmed = CovidCases(
-//                        total = 70,
-//                        new = 9
-//                    ),
-//                    recovered = CovidCases(
-//                        total = 30,
-//                        new = 4
-//                    ),
-//                    deaths = CovidCases(
-//                        total = 8,
-//                        new = 2
-//                    )
-//                ),
-//            )
-//        )
-//
-////        API 503(((
         return covidApi.getSummary().toSummary()
     }
 
@@ -122,8 +61,14 @@ class CovidRepositoryImpl @Inject constructor(
         val countriesWithCases = covidDb.countriesDao().getCountriesWithCases()
         return Summary(
             countries = countriesWithCases.map { it.toCountrySummary() },
-            lastUpdated = Date().also { date ->
-                date.time = countriesWithCases.minOfOrNull { it.country.dateUpdated } ?: 0
+            lastUpdated = if (countriesWithCases.isEmpty()) {
+                null
+            } else {
+                Date().also { date ->
+                    countriesWithCases.minOfOrNull { it.country.dateUpdated }?.let {
+                        date.time = it
+                    }
+                }
             }
         )
     }
@@ -134,6 +79,7 @@ class CovidRepositoryImpl @Inject constructor(
             val localCountryDetails = getLocalCountryDetails(countryCode)
             val localSummary = getLocalSummary()
             emit(Resource.Success(localCountryDetails))
+            emit(Resource.Loading())
             localSummary.lastUpdated?.let { lastUpdated ->
                 val remoteHistory = getRemoteCasesHistory(localCountryDetails, lastUpdated)
                 saveLocalCases(remoteHistory)

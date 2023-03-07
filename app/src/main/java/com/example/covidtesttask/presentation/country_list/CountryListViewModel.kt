@@ -49,14 +49,16 @@ class CountryListViewModel @Inject constructor(
                 when (resource) {
                     is Resource.Loading -> {
                         _uiState.value = _uiState.value.copy(
-                            lastUpdated = null,
-                            countries = emptyList(),
+                            refreshing = true
                         )
                     }
                     is Resource.Success -> {
                         updateData(resource.data!!)
                     }
                     is Resource.Error -> {
+                        _uiState.value = _uiState.value.copy(
+                            refreshing = false
+                        )
                         // TODO: display error
                     }
                 }
@@ -67,6 +69,7 @@ class CountryListViewModel @Inject constructor(
     private fun updateData(summary: Summary) {
         countryList = summary.countries
         _uiState.value = _uiState.value.copy(
+            refreshing = false,
             lastUpdated = summary.lastUpdated,
             countries = performSearch(_uiState.value.searchQuery).map { CountryItem.fromCountry(it) }
         )
